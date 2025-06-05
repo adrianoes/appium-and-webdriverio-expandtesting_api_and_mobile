@@ -120,5 +120,5 @@ Check then both to add both options in context menu.
 
 - UI and API tests to send password reset link to user's email and API tests to verify a password reset token and reset a user's password must be tested manually as they rely on e-mail verification. 
 - Disable wifi when the apk presents connections problems.
-- When downloading the artifact from github actions, execute ```npx allure generate allure-results``` to generate allure report and then execute ```npx allure open allure-report``` to open it.
+- When downloading the artifact from github actions, unzip it and execute ```npx allure generate allure-results``` to generate allure report and then execute ```npx allure open allure-report``` to open it.
 
