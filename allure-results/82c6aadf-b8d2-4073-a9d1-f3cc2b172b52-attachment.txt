@@ -1,0 +1,4 @@
+{
+  "using": "xpath",
+  "value": ".//xpath[normalize-space(text()) = \"//android.widget.EditText[@resource-id=\"com.ab.apiclient:id/etUrl\"]\"] | .//xpath[not(.//xpath[normalize-space(text()) = \"//android.widget.EditText[@resource-id=\"com.ab.apiclient:id/etUrl\"]\"]) and normalize-space() = \"//android.widget.EditText[@resource-id=\"com.ab.apiclient:id/etUrl\"]\"]"
+}
