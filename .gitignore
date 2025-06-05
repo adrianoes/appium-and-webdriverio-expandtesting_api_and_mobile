@@ -1,3 +1,6 @@
 node_modules/
 commiting.txt
 reports/
+allure-results
+allure-report
+.allure

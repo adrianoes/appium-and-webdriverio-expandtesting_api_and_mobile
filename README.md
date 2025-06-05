@@ -98,8 +98,8 @@ Check then both to add both options in context menu.
 - Execute the command block below to run all the tests, generate and open allure-report.
   ```
     npx wdio run wdio.conf.js
-    npx allure generate reports/allure-results --clean -o reports/allure-report
-    npx allure open reports/allure-report
+    npx allure generate allure-results 
+    npx allure open allure-report
   ```
 
 # Support:
@@ -120,4 +120,5 @@ Check then both to add both options in context menu.
 
 - UI and API tests to send password reset link to user's email and API tests to verify a password reset token and reset a user's password must be tested manually as they rely on e-mail verification. 
 - Disable wifi when the apk presents connections problems.
-- Double clicking the index.html file to see allure-report will not work. The command ```npx allure open reports/allure-report``` should be executed in order to open the allure-report correctly.
+- When downloading the artifact from github actions, execute ```npx allure generate allure-results``` to generate allure report and then execute ```npx allure open allure-report``` to open it.
+
