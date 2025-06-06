@@ -93,13 +93,13 @@ Check then both to add both options in context menu.
 
 - Execute ```npx wdio run wdio.conf.js``` to execute all tests. 
 - Execute ```npx wdio run wdio.conf.js --watch``` to execute all tests and keep the browser open. 
-- Execute ```npx wdio run wdio.conf.js --spec test/specs/mobile/users.e2e.js``` to execute all tests in the users.e2e.js file. 
-- Configure the desired test like ```it.only``` and execute ```npx wdio run wdio.conf.js --spec test/specs/mobile/users.e2e.js``` to execute only the desired test in the users.e2e.js file.
+- Execute ```npx wdio run wdio.conf.js --spec tests/specs/users.e2e.js``` to execute all tests in the users.e2e.js file. 
+- Configure the desired test like ```it.only``` and execute ```npx wdio run wdio.conf.js --spec tests/specs/users.e2e.js``` to execute only the desired test in the users.e2e.js file.
 - Execute the command block below to run all the tests, generate and open allure-report.
   ```
-    npx wdio run wdio.conf.js
-    npx allure generate allure-results 
-    npx allure open allure-report
+  npx wdio run wdio.conf.js
+  npx allure generate allure-results 
+  npx allure open allure-report
   ```
 
 # Support:
