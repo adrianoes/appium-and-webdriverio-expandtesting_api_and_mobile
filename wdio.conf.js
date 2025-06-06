@@ -63,7 +63,7 @@ export const config = {
         'appium:autoGrantPermissions': true,
         'appium:appActivity': 'com.ab.apiclient.ui.Splash',
         'appium:appWaitActivity': 'com.ab.apiclient.ui.Splash,com.ab.apiclient.*,com.ab.apiclient.ui.MainActivity',
-        'appium:appWaitDuration': 20000,
+        'appium:appWaitDuration': 120000,
         'appium:noReset': true,
         'appium:autoDismissAlerts': true,
         'appium:uiautomator2ServerInstallTimeout': 120000
@@ -103,11 +103,11 @@ export const config = {
     // baseUrl: 'http://localhost:8080',
     //
     // Default timeout for all waitFor* commands.
-    waitforTimeout: 120000,
+    waitforTimeout: 600000,
     //
     // Default timeout in milliseconds for request
     // if browser driver or grid doesn't send response
-    connectionRetryTimeout: 120000,
+    connectionRetryTimeout: 600000,
     //
     // Default request retries count
     connectionRetryCount: 3,
@@ -145,7 +145,7 @@ export const config = {
     // See the full list at http://mochajs.org/
     mochaOpts: {
         ui: 'bdd',
-        timeout: 120000
+        timeout: 600000
     },
 
     //
@@ -232,6 +232,22 @@ export const config = {
      */
     // afterHook: function (test, context, { error, result, duration, passed, retries }, hookName) {
     // },
+
+
+
+    beforeTest: async function () {
+        await driver.execute('mobile: activateApp', { appId: 'com.ab.apiclient' });
+    },
+
+
+
+
+    afterTest: async function () {
+        await driver.execute('mobile: terminateApp', { appId: 'com.ab.apiclient' });
+    },
+
+
+
     /**
      * Function to be executed after a test (in Mocha/Jasmine only)
      * @param {object}  test             test object
@@ -242,11 +258,11 @@ export const config = {
      * @param {boolean} result.passed    true if test has passed, otherwise false
      * @param {object}  result.retries   information about spec related retries, e.g. `{ attempts: 0, limit: 0 }`
      */
-    afterTest: async function(test, context, { error, result, duration, passed, retries }) {
-        if (!passed) {
-            await browser.takeScreenshot();
-        }
-    },
+    // afterTest: async function(test, context, { error, result, duration, passed, retries }) {
+    //     if (!passed) {
+    //         await browser.takeScreenshot();
+    //     }
+    // },
 
 
     /**

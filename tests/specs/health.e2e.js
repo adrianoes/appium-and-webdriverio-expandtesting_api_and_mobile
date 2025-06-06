@@ -11,7 +11,7 @@ async function sleep(ms) {
 }
 
 describe('Health API test', () => {
-  it('should check API health', async () => {
+  it('check API health', async () => {
     // Desativa o Wi-Fi via ADB
     execSync('adb shell svc wifi disable');
 
