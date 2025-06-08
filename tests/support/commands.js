@@ -259,6 +259,27 @@ export async function addTokenHeader(randomNumber) {
     await (await wait('android=new UiSelector().text("Value")')).setValue(userToken);
 }
 
+export async function addTokenHeaderUR(randomNumber) {
+    const filePath = `tests/fixtures/testdata-${randomNumber}.json`;
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const userToken = data.user_token;
+
+    const wait = async (locator) => {
+        const el = await $(locator);
+        await el.waitForDisplayed({ timeout: 20000 });
+        return el;
+    };
+
+    // Abrir painel de header
+    await (await wait('android=new UiSelector().className("android.widget.ImageView").instance(0)')).click();
+
+    // Preencher "Key" com x-auth-token
+    await (await wait('android=new UiSelector().text("Key")')).setValue('x-auth-token');
+
+    // Preencher "Value" com o token do usuário
+    await (await wait('android=new UiSelector().text("Value")')).setValue('@'+userToken);
+}
+
 export async function createNote(randomNumber) {
   const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
   const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
@@ -330,6 +351,85 @@ export async function createNote(randomNumber) {
   
   fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
   
+  (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+  (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+}
+
+export async function create2ndNote(randomNumber) {
+  const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+  const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+  const user_token = data.user_token;
+  const user_id = data.user_id;
+
+  const noteTitle2 = faker.lorem.words(4);
+  const noteDescription2 = faker.lorem.words(5);
+  const noteCategory2 = faker.helpers.arrayElement(['Home', 'Personal', 'Work']);
+
+  // Seleciona método HTTP POST
+  const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+  await methodDropdown.click();
+  const postOption = await $(`android=new UiSelector().text("POST")`);
+  await postOption.click();
+
+  // Insere URL do endpoint
+  const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+  await urlInput.setValue("https://practice.expandtesting.com/notes/api/notes");
+
+  // Adiciona headers necessários
+  await addAcceptHeader();
+  await addContentTypeHeader();
+  await addTokenHeader(randomNumber);
+
+  // Localiza campo JSON
+  const jsonInputField = await $('id:com.ab.apiclient:id/etJSONData');
+
+  // Prepara corpo JSON da segunda nota
+  const jsonBody = JSON.stringify({
+    title: noteTitle2,
+    description: noteDescription2,
+    category: noteCategory2,
+  });
+
+  await jsonInputField.clearValue();
+  await jsonInputField.setValue(jsonBody);
+
+  // Envia requisição
+  const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+  await sendButton.click();
+
+  // Visualiza aba "Raw"
+  const rawTab = await $(`android=new UiSelector().text("Raw")`);
+  await rawTab.click();
+  await waitForResultElementAndCloseAd();
+
+  // Captura e valida resposta
+  const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+  const response = JSON.parse(responseText);
+
+  expect(response.success).toBe(true);
+  expect(String(response.status)).toBe("200");
+  expect(response.message).toBe("Note successfully created");
+
+  const noteData = response.data;
+
+  expect(noteData.user_id).toBe(user_id);
+  expect(noteData.title).toBe(noteTitle2);
+  expect(noteData.description).toBe(noteDescription2);
+  expect(noteData.category).toBe(noteCategory2);
+  expect(noteData.completed).toBe(false);
+
+  // Atualiza JSON local com dados da segunda nota
+  data.note_id_2 = noteData.id;
+  data.note_title_2 = noteData.title;
+  data.note_description_2 = noteData.description;
+  data.note_category_2 = noteData.category;
+  data.note_completed_2 = noteData.completed;
+  data.note_created_at_2 = noteData.created_at;
+  data.note_updated_at_2 = noteData.updated_at;
+
+  fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+
   (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
   (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 }

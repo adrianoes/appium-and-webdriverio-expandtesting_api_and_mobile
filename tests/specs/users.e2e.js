@@ -5,6 +5,7 @@ import {
   addAcceptHeader,
   addContentTypeHeader,
   addTokenHeader,
+  addTokenHeaderUR,
   waitUntilElementVisible,
   waitForResultElementAndCloseAd,
   logInUser,

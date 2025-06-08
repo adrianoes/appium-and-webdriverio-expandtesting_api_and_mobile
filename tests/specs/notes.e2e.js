@@ -5,6 +5,7 @@ import {
   addAcceptHeader,
   addContentTypeHeader,
   addTokenHeader,
+  addTokenHeaderUR,
   waitUntilElementVisible,
   waitForResultElementAndCloseAd,
   logInUser,
@@ -12,6 +13,7 @@ import {
   createUser,
   deleteJsonFile,
   createNote,
+  create2ndNote,
 } from '../support/commands.js';
 
 async function sleep(ms) {
@@ -103,6 +105,85 @@ describe('notes test', () => {
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
+
+  it.only('get notes', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+    await create2ndNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    // Seleciona método HTTP GET
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const getOption = await $(`android=new UiSelector().text("GET")`);
+    await getOption.click();
+
+    // Insere URL para obter todas as notas
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue("https://practice.expandtesting.com/notes/api/notes");
+
+    // Adiciona headers necessários
+    await addAcceptHeader();
+    await addTokenHeader(randomNumber);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Visualiza aba "Raw"
+    const rawTab = await $(`android=new UiSelector().text("Raw")`);
+    await rawTab.click();
+    await waitForResultElementAndCloseAd();
+
+    // Captura e valida resposta
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(true);
+    expect(String(response.status)).toBe("200");
+    expect(response.message).toBe("Notes successfully retrieved");
+
+    const notes = response.data;
+    expect(notes.length).toBe(2);
+
+    const userId = data.user_id;
+
+    // Nota 2 (mais recente, índice 0)
+    const note2 = notes[0];
+    expect(note2.id).toBe(data.note_id_2);
+    expect(note2.user_id).toBe(userId);
+    expect(note2.title).toBe(data.note_title_2);
+    expect(note2.description).toBe(data.note_description_2);
+    expect(note2.category).toBe(data.note_category_2);
+    expect(note2.completed).toBe(data.note_completed_2);
+    expect(note2.created_at).toBe(data.note_created_at_2);
+    expect(note2.updated_at).toBe(data.note_updated_at_2);
+
+    // Nota 1 (primeira criada, índice 1)
+    const note1 = notes[1];
+    expect(note1.id).toBe(data.note_id);
+    expect(note1.user_id).toBe(userId);
+    expect(note1.title).toBe(data.note_title);
+    expect(note1.description).toBe(data.note_description);
+    expect(note1.category).toBe(data.note_category);
+    expect(note1.completed).toBe(data.note_completed);
+    expect(note1.created_at).toBe(data.note_created_at);
+    expect(note1.updated_at).toBe(data.note_updated_at);
+
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
 
   it('get note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
