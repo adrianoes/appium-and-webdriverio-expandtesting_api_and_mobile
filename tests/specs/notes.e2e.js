@@ -106,7 +106,7 @@ describe('notes test', () => {
     deleteJsonFile(randomNumber);
   });
 
-  it.only('get notes', async () => {
+  it('get notes', async () => {
     const randomNumber = faker.string.alphanumeric(12);
     await createUser(randomNumber);
     await logInUser(randomNumber);
@@ -183,7 +183,6 @@ describe('notes test', () => {
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
-
 
   it('get note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
@@ -425,19 +424,6 @@ describe('notes test', () => {
 
     (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
-
-    // Cleanup
-    await deleteUser(randomNumber);
-    await sleep(5000);
-    deleteJsonFile(randomNumber);
-  });
-
-  it('delete note', async () => {
-    const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
-
 
     // Cleanup
     await deleteUser(randomNumber);
