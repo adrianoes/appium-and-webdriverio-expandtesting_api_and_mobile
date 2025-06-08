@@ -258,3 +258,78 @@ export async function addTokenHeader(randomNumber) {
     // Preencher "Value" com o token do usuário
     await (await wait('android=new UiSelector().text("Value")')).setValue(userToken);
 }
+
+export async function createNote(randomNumber) {
+  const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+  const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+  const { user_token, user_id } = fileContent;
+  
+  const noteTitle = faker.lorem.sentence(4);
+  const noteDescription = faker.lorem.sentence(5);
+  const noteCategory = faker.helpers.arrayElement(['Home', 'Personal', 'Work']);
+  
+    // HTTP Method: POST
+  const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+  await methodDropdown.click();
+  const postOption = await $(`android=new UiSelector().text("POST")`);
+  await postOption.click();
+  
+  // Endpoint URL
+  const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+  await urlInput.setValue('https://practice.expandtesting.com/notes/api/notes');
+  
+  // Headers
+  await addAcceptHeader();
+  await addContentTypeHeader();
+  await addTokenHeader(randomNumber);
+  
+  // Body
+  const jsonInput = await waitUntilElementVisible('id', 'com.ab.apiclient:id/etJSONData');
+  const jsonBody = JSON.stringify({
+    title: noteTitle,
+    description: noteDescription,
+    category: noteCategory,
+  });
+  
+  await jsonInput.clearValue();
+  await jsonInput.setValue(jsonBody);
+  
+  // Send
+  const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+  await sendButton.click();
+  
+  // Raw response
+  const rawTab = await $(`android=new UiSelector().text("Raw")`);
+  await rawTab.click();
+  await waitForResultElementAndCloseAd();
+  
+  const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+  const response = JSON.parse(responseText);
+  
+  expect(response.success).toBe(true);
+  expect(String(response.status)).toBe('200');
+  expect(response.message).toBe('Note successfully created');
+  
+  const noteData = response.data;
+  expect(noteData.user_id).toBe(user_id);
+  expect(noteData.title).toBe(noteTitle);
+  expect(noteData.description).toBe(noteDescription);
+  expect(noteData.category).toBe(noteCategory);
+  expect(noteData.completed).toBe(false);
+  
+  // Update testdata JSON
+  Object.assign(fileContent, {
+    note_id: noteData.id,
+    note_title: noteData.title,
+    note_description: noteData.description,
+    note_category: noteData.category,
+    note_completed: noteData.completed,
+    note_created_at: noteData.created_at,
+    note_updated_at: noteData.updated_at,
+  });
+  
+  fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
+  
+  (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+  (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+}

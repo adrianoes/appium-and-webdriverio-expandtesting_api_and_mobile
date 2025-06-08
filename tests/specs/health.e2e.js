@@ -10,7 +10,7 @@ async function sleep(ms) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-describe('Health API test', () => {
+describe('health check test', () => {
   it('check API health', async () => {
     // Desativa o Wi-Fi via ADB
     execSync('adb shell svc wifi disable');

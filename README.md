@@ -116,6 +116,7 @@ Check then both to add both options in context menu.
 - [how to handle app generated popups in appium](https://stackoverflow.com/a/54970700)
 - [Getting Started](https://webdriver.io/docs/gettingstarted#run-test)
 - [Original error: 'POST /elements' cannot be proxied to UiAutomator2 server because the instrumentation process is not running (probably crashed).](https://github.com/appium/appium/issues/15087#issuecomment-1211697568)
+- [Expect](https://webdriver.io/docs/api/expect-webdriverio/)
 
 # Tips:
 
