@@ -106,6 +106,122 @@ describe('notes test', () => {
     deleteJsonFile(randomNumber);
   });
 
+  it('create note br', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const { user_token, user_id } = fileContent;
+
+    const noteTitle = faker.lorem.sentence(4);
+    const noteDescription = faker.lorem.sentence(5);
+    const noteCategory = faker.helpers.arrayElement(['Home', 'Personal', 'Work']);
+
+    // HTTP Method: POST
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const postOption = await $(`android=new UiSelector().text("POST")`);
+    await postOption.click();
+
+    // Endpoint URL
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue('https://practice.expandtesting.com/notes/api/notes');
+
+    // Headers
+    await addAcceptHeader();
+    await addContentTypeHeader();
+    await addTokenHeader(randomNumber);
+
+    // Body
+    const jsonInput = await waitUntilElementVisible('id', 'com.ab.apiclient:id/etJSONData');
+    const jsonBody = JSON.stringify({
+      title: noteTitle,
+      description: noteDescription,
+      category: "a",
+    });
+
+    await jsonInput.clearValue();
+    await jsonInput.setValue(jsonBody);
+
+    // Send
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('400');
+    expect(response.message).toBe('Category must be one of the categories: Home, Work, Personal');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
+  it('create note ur', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const { user_token, user_id } = fileContent;
+
+    const noteTitle = faker.lorem.sentence(4);
+    const noteDescription = faker.lorem.sentence(5);
+    const noteCategory = faker.helpers.arrayElement(['Home', 'Personal', 'Work']);
+
+    // HTTP Method: POST
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const postOption = await $(`android=new UiSelector().text("POST")`);
+    await postOption.click();
+
+    // Endpoint URL
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue('https://practice.expandtesting.com/notes/api/notes');
+
+    // Headers
+    await addAcceptHeader();
+    await addContentTypeHeader();
+    await addTokenHeaderUR(randomNumber);
+
+    // Body
+    const jsonInput = await waitUntilElementVisible('id', 'com.ab.apiclient:id/etJSONData');
+    const jsonBody = JSON.stringify({
+      title: noteTitle,
+      description: noteDescription,
+      category: noteCategory,
+    });
+
+    await jsonInput.clearValue();
+    await jsonInput.setValue(jsonBody);
+
+    // Send
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('401');
+    expect(response.message).toBe('Access token is not valid or has expired, you will need to login');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
   it('get notes', async () => {
     const randomNumber = faker.string.alphanumeric(12);
     await createUser(randomNumber);
@@ -184,6 +300,51 @@ describe('notes test', () => {
     deleteJsonFile(randomNumber);
   });
 
+  it('get notes ur', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+    await create2ndNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    // Seleciona método HTTP GET
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const getOption = await $(`android=new UiSelector().text("GET")`);
+    await getOption.click();
+
+    // Insere URL para obter todas as notas
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue("https://practice.expandtesting.com/notes/api/notes");
+
+    // Adiciona headers necessários
+    await addAcceptHeader();
+    await addTokenHeaderUR(randomNumber);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura e valida resposta
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe("401");
+    expect(response.message).toBe("Access token is not valid or has expired, you will need to login");
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
   it('get note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
     await createUser(randomNumber);
@@ -245,6 +406,62 @@ describe('notes test', () => {
     expect(noteData.completed).toBe(note_completed);
     expect(noteData.created_at).toBe(note_created_at);
     expect(noteData.updated_at).toBe(note_updated_at);
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
+  it('get note ur', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    const {
+        user_token,
+        user_id,
+        note_id,
+        note_title,
+        note_description,
+        note_category,
+        note_completed,
+        note_created_at,
+        note_updated_at,
+    } = fileContent;
+
+    // Seleciona método HTTP GET
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const getOption = await $(`android=new UiSelector().text("GET")`);
+    await getOption.click();
+
+    // Insere URL com ID da nota
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue(`https://practice.expandtesting.com/notes/api/notes/${note_id}`);
+
+    // Adiciona headers obrigatórios
+    await addAcceptHeader();
+    await addTokenHeaderUR(randomNumber);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura resposta e valida
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('401');
+    expect(response.message).toBe('Access token is not valid or has expired, you will need to login');
 
     (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
@@ -348,6 +565,142 @@ describe('notes test', () => {
     deleteJsonFile(randomNumber);
   });
 
+  it('update note br', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    const {
+        user_token,
+        user_id,
+        note_id,
+        note_created_at,
+    } = fileContent;
+
+    const noteUpdatedTitle = faker.lorem.sentence(4);
+    const noteUpdatedDescription = faker.lorem.sentence(5);
+    const noteUpdatedCategory = faker.helpers.arrayElement(['Home', 'Personal', 'Work']);
+    const noteUpdatedCompleted = true;
+
+    // Seleciona método HTTP PUT
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const putOption = await $(`android=new UiSelector().text("PUT")`);
+    await putOption.click();
+
+    // Insere URL com ID da nota
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue(`https://practice.expandtesting.com/notes/api/notes/${note_id}`);
+
+    // Adiciona headers obrigatórios
+    await addAcceptHeader();
+    await addContentTypeHeader();
+    await addTokenHeader(randomNumber);
+
+    // Prepara corpo JSON com dados atualizados
+    const jsonInput = await $('id:com.ab.apiclient:id/etJSONData');
+    const jsonBody = JSON.stringify({
+        title: noteUpdatedTitle,
+        description: noteUpdatedDescription,
+        category: "a",
+        completed: noteUpdatedCompleted,
+    });
+    await jsonInput.clearValue();
+    await jsonInput.setValue(jsonBody);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura resposta e valida
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('400');
+    expect(response.message).toBe('Category must be one of the categories: Home, Work, Personal');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
+  it('update note ur', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    const {
+        user_token,
+        user_id,
+        note_id,
+        note_created_at,
+    } = fileContent;
+
+    const noteUpdatedTitle = faker.lorem.sentence(4);
+    const noteUpdatedDescription = faker.lorem.sentence(5);
+    const noteUpdatedCategory = faker.helpers.arrayElement(['Home', 'Personal', 'Work']);
+    const noteUpdatedCompleted = true;
+
+    // Seleciona método HTTP PUT
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const putOption = await $(`android=new UiSelector().text("PUT")`);
+    await putOption.click();
+
+    // Insere URL com ID da nota
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue(`https://practice.expandtesting.com/notes/api/notes/${note_id}`);
+
+    // Adiciona headers obrigatórios
+    await addAcceptHeader();
+    await addContentTypeHeader();
+    await addTokenHeaderUR(randomNumber);
+
+    // Prepara corpo JSON com dados atualizados
+    const jsonInput = await $('id:com.ab.apiclient:id/etJSONData');
+    const jsonBody = JSON.stringify({
+        title: noteUpdatedTitle,
+        description: noteUpdatedDescription,
+        category: noteUpdatedCategory,
+        completed: noteUpdatedCompleted,
+    });
+    await jsonInput.clearValue();
+    await jsonInput.setValue(jsonBody);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura resposta e valida
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('401');
+    expect(response.message).toBe('Access token is not valid or has expired, you will need to login');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
   it('update note status', async () => {
     const randomNumber = faker.string.alphanumeric(12);
     await createUser(randomNumber);
@@ -431,6 +784,134 @@ describe('notes test', () => {
     deleteJsonFile(randomNumber);
   });
 
+  it('update note status br', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    const {
+        user_token,
+        user_id,
+        note_id,
+        note_title,
+        note_description,
+        note_category,
+        note_created_at,
+        note_updated_at,
+    } = fileContent;
+
+    const noteUpdatedCompleted = true;
+
+    // Seleciona método HTTP PATCH
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const patchOption = await $(`android=new UiSelector().text("PATCH")`);
+    await patchOption.click();
+
+    // Insere URL com ID da nota
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue(`https://practice.expandtesting.com/notes/api/notes/${note_id}`);
+
+    // Adiciona headers obrigatórios
+    await addAcceptHeader();
+    await addContentTypeHeader();
+    await addTokenHeader(randomNumber);
+
+    // Prepara corpo JSON com atualização do status
+    const jsonInput = await $('id:com.ab.apiclient:id/etJSONData');
+    const jsonBody = JSON.stringify({ completed: "a" });
+    await jsonInput.clearValue();
+    await jsonInput.setValue(jsonBody);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura resposta e valida
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('400');
+    expect(response.message).toBe('Note completed status must be boolean');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
+  it('update note status ur', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    const {
+        user_token,
+        user_id,
+        note_id,
+        note_title,
+        note_description,
+        note_category,
+        note_created_at,
+        note_updated_at,
+    } = fileContent;
+
+    const noteUpdatedCompleted = true;
+
+    // Seleciona método HTTP PATCH
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const patchOption = await $(`android=new UiSelector().text("PATCH")`);
+    await patchOption.click();
+
+    // Insere URL com ID da nota
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue(`https://practice.expandtesting.com/notes/api/notes/${note_id}`);
+
+    // Adiciona headers obrigatórios
+    await addAcceptHeader();
+    await addContentTypeHeader();
+    await addTokenHeaderUR(randomNumber);
+
+    // Prepara corpo JSON com atualização do status
+    const jsonInput = await $('id:com.ab.apiclient:id/etJSONData');
+    const jsonBody = JSON.stringify({ completed: noteUpdatedCompleted });
+    await jsonInput.clearValue();
+    await jsonInput.setValue(jsonBody);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura resposta e valida
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('401');
+    expect(response.message).toBe('Access token is not valid or has expired, you will need to login');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
   it('delete note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
     await createUser(randomNumber);
@@ -490,5 +971,96 @@ describe('notes test', () => {
     deleteJsonFile(randomNumber);
   });
 
+  it('delete note br', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    const { user_token, note_id } = fileContent;
+
+    // Seleciona método HTTP DELETE
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const deleteOption = await $(`android=new UiSelector().text("DELETE")`);
+    await deleteOption.click();
+
+    // Insere URL com ID da nota
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue(`https://practice.expandtesting.com/notes/api/notes/'@'+${note_id}`);
+
+    // Adiciona headers obrigatórios
+    await addAcceptHeader();
+    await addTokenHeader(randomNumber);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura resposta e valida
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('400');
+    expect(response.message).toBe('Note ID must be a valid ID');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
+
+  it('delete note ur', async () => {
+    const randomNumber = faker.string.alphanumeric(12);
+    await createUser(randomNumber);
+    await logInUser(randomNumber);
+    await createNote(randomNumber);
+
+    const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
+    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+
+    const { user_token, note_id } = fileContent;
+
+    // Seleciona método HTTP DELETE
+    const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
+    await methodDropdown.click();
+    const deleteOption = await $(`android=new UiSelector().text("DELETE")`);
+    await deleteOption.click();
+
+    // Insere URL com ID da nota
+    const urlInput = await $('id:com.ab.apiclient:id/etUrl');
+    await urlInput.setValue(`https://practice.expandtesting.com/notes/api/notes/${note_id}`);
+
+    // Adiciona headers obrigatórios
+    await addAcceptHeader();
+    await addTokenHeaderUR(randomNumber);
+
+    // Envia requisição
+    const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
+
+    // Captura resposta e valida
+    const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
+    const response = JSON.parse(responseText);
+
+    expect(response.success).toBe(false);
+    expect(String(response.status)).toBe('401');
+    expect(response.message).toBe('Access token is not valid or has expired, you will need to login');
+
+    (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
+    (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
+
+    // Cleanup
+    await deleteUser(randomNumber);
+    await sleep(5000);
+    deleteJsonFile(randomNumber);
+  });
 
 });
