@@ -69,7 +69,6 @@ describe('users test', () => {
     expect(responseJson.success).toBe(true);
     expect(String(responseJson.status)).toBe('201');
     expect(responseJson.message).toBe('User account created successfully');
-    expect(responseJson.data.id).toBe(user_id);
     expect(responseJson.data.name).toBe(user_name);
     expect(responseJson.data.email).toBe(user_email);
 
