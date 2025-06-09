@@ -177,9 +177,9 @@ export function deleteJsonFile(randomNumber) {
 }
 
 export async function createUser(randomNumber) {
-  const userName = faker.person.fullName();
-  const userEmail = faker.string.alphanumeric(2).toLowerCase() + faker.internet.email().replace(/-/g, '').toLowerCase();
-  const userPassword = faker.internet.password({ length: 12, memorable: false });
+  const user_name = faker.person.fullName();
+  const user_email = faker.string.alphanumeric(2).toLowerCase() + faker.internet.email().replace(/-/g, '').toLowerCase();
+  const user_password = faker.internet.password({ length: 12, memorable: false });
 
    // Desativa o Wi-Fi
   execSync('adb shell svc wifi disable');
@@ -202,9 +202,9 @@ export async function createUser(randomNumber) {
 
   const jsonInput = await waitUntilElementVisible('id', 'com.ab.apiclient:id/etJSONData');
   const jsonBody = JSON.stringify({
-    name: userName,
-    email: userEmail,
-    password: userPassword
+    name: user_name,
+    email: user_email,
+    password: user_password
   });  
   await jsonInput.setValue(jsonBody);
 
@@ -231,10 +231,10 @@ export async function createUser(randomNumber) {
 
   // Cria arquivo com dados do usuário
   const testData = {
-    user_email: userEmail,
-    user_password: userPassword,
+    user_email: user_email,
+    user_password: user_password,
     user_id: responseJson.data.id,
-    user_name: userName,
+    user_name: user_name,
   };
   const filePath = path.resolve(`tests/fixtures/testdata-${randomNumber}.json`);
   fs.writeFileSync(filePath, JSON.stringify(testData, null, 2));
