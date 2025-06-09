@@ -223,6 +223,9 @@ export async function createUser(randomNumber) {
   expect(responseJson.success).toBe(true);
   expect(String(responseJson.status)).toBe('201');
   expect(responseJson.message).toBe('User account created successfully');
+  expect(responseJson.data.id).toBe(user_id);
+  expect(responseJson.data.name).toBe(user_name);
+  expect(responseJson.data.email).toBe(user_email);
 
   (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
   (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
