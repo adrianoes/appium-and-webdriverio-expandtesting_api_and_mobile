@@ -147,6 +147,7 @@ describe('notes test', () => {
 
     // Send
     const sendButton = await $('id:com.ab.apiclient:id/btnSend');
+    await sendButton.click();
 
     const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
     const response = JSON.parse(responseText);
@@ -205,7 +206,8 @@ describe('notes test', () => {
 
     // Send
     const sendButton = await $('id:com.ab.apiclient:id/btnSend');
-
+    await sendButton.click();
+    
     const responseText = await $('id:com.ab.apiclient:id/tvResult').getText();
     const response = JSON.parse(responseText);
 
