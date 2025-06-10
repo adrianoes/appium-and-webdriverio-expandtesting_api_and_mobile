@@ -106,13 +106,23 @@ export const config = {
      * @param {object} suite suite details
      */
 
+    // beforeTest: async function () {
+    //     await driver.execute('mobile: activateApp', { appId: 'com.ab.apiclient' });
+    // },
+
     beforeTest: async function () {
-        await driver.reset(); // Limpa dados e reinicia o app
+        const appPath = path.resolve('./apps/apiClient.apk');
+
+        try {
+            await driver.removeApp('com.ab.apiclient');
+        } catch (err) {
+            console.warn('App not installed or already removed:', err.message);
+        }
+
+        await driver.installApp(appPath);
+        await driver.execute('mobile: activateApp', { appId: 'com.ab.apiclient' });
         await driver.pause(3000); // pequeno delay se necessário
     },
-
-
-
 
     afterTest: async function () {
         await driver.execute('mobile: terminateApp', { appId: 'com.ab.apiclient' });
