@@ -1,6 +1,8 @@
-import fs from 'fs';
+import fs from 'fs/promises'; // para usar await
+
 import path from 'path';
 import { faker } from '@faker-js/faker';
+import supertest from 'supertest';
 import {
   addAcceptHeader,
   addContentTypeHeader,
@@ -8,12 +10,12 @@ import {
   addTokenHeaderUR,
   waitUntilElementVisible,
   waitForResultElementAndCloseAd,
-  logInUser,
-  deleteUser,
-  createUser,
+  logInUserViaApi,
+  deleteUserViaApi,
+  createUserViaApi,
   deleteJsonFile,
-  createNote,
-  create2ndNote,
+  createNoteViaApi,
+  create2ndNoteViaApi
 } from '../support/commands.js';
 
 async function sleep(ms) {
@@ -24,11 +26,11 @@ describe('notes test', () => {
     
   it('create note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
     const { user_token, user_id } = fileContent;
 
     const noteTitle = faker.lorem.sentence(4);
@@ -95,24 +97,24 @@ describe('notes test', () => {
       note_updated_at: noteData.updated_at,
     });
 
-    fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(fileContent, null, 2));
 
     (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('create note br', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
     const { user_token, user_id } = fileContent;
 
     const noteTitle = faker.lorem.sentence(4);
@@ -160,18 +162,18 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('create note ur', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
     const { user_token, user_id } = fileContent;
 
     const noteTitle = faker.lorem.sentence(4);
@@ -219,20 +221,20 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('get notes', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
-    await create2ndNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
+    await create2ndNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     // Seleciona método HTTP GET
     const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
@@ -297,20 +299,20 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('get notes ur', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
-    await create2ndNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
+    await create2ndNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const data = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const data = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     // Seleciona método HTTP GET
     const methodDropdown = await $('id:com.ab.apiclient:id/spHttpMethod');
@@ -342,19 +344,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('get note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -413,19 +415,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('get note ur', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -469,19 +471,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('update note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -556,25 +558,25 @@ describe('notes test', () => {
         note_completed: noteData.completed,
         note_updated_at: noteData.updated_at,
     });
-    fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(fileContent, null, 2));
 
     (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('update note br', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -630,19 +632,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('update note ur', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -698,19 +700,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('update note status', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -775,25 +777,25 @@ describe('notes test', () => {
 
     // Atualiza JSON local com novo status
     fileContent.note_completed = noteData.completed;
-    fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(fileContent, null, 2));
 
     (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('update note status br', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -845,19 +847,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('update note status ur', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const {
         user_token,
@@ -909,19 +911,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('delete note', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const { user_token, note_id } = fileContent;
 
@@ -962,25 +964,25 @@ describe('notes test', () => {
         delete fileContent[key];
         }
     }
-    fs.writeFileSync(filePath, JSON.stringify(fileContent, null, 2));
+    await fs.writeFile(filePath, JSON.stringify(fileContent, null, 2));
 
     (await waitUntilElementVisible('class name', 'android.widget.ImageButton')).click();
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('delete note br', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const { user_token, note_id } = fileContent;
 
@@ -1014,19 +1016,19 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });
 
   it('delete note ur', async () => {
     const randomNumber = faker.string.alphanumeric(12);
-    await createUser(randomNumber);
-    await logInUser(randomNumber);
-    await createNote(randomNumber);
+    await createUserViaApi(randomNumber);
+    await logInUserViaApi(randomNumber);
+    await createNoteViaApi(randomNumber);
 
     const filePath = `./tests/fixtures/testdata-${randomNumber}.json`;
-    const fileContent = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
+    const fileContent = JSON.parse(await fs.readFile(filePath, 'utf-8'));
 
     const { user_token, note_id } = fileContent;
 
@@ -1060,7 +1062,7 @@ describe('notes test', () => {
     (await waitUntilElementVisible('android', 'new UiSelector().text("New Request")')).click();
 
     // Cleanup
-    await deleteUser(randomNumber);
+    await deleteUserViaApi(randomNumber);
     await sleep(5000);
     deleteJsonFile(randomNumber);
   });

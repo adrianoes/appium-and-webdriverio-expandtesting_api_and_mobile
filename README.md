@@ -1,6 +1,6 @@
-# appium-and-webdriverio-expandtesting_mobile
+# appium-and-webdriverio-expandtesting_api_and_mobile
 
-Mobile testing in ApiClient apk using [expandtesting](https://practice.expandtesting.com/notes/api/api-docs/). This project contains basic examples on how to use Appium and WebdriverIO to test Mobile tests. Good practices such as hooks, custom commands and tags, among others, are used. All the necessary support documentation to develop this project is placed here. 
+API and Mobile testing in ApiClient apk using [expandtesting](https://practice.expandtesting.com/notes/api/api-docs/). This project contains basic examples on how to use SuperTest, Appium and WebdriverIO to test API and Mobile tests and how to mix API and Mobile test approachs. Good practices such as hooks, custom commands and tags, among others, are used. All the necessary support documentation to develop this project is placed here. 
 
 # Pre-requirements:
 
@@ -18,6 +18,7 @@ Mobile testing in ApiClient apk using [expandtesting](https://practice.expandtes
 | Virtual device                  | Pixel 4        | -                                                               |
 | Virtual device API              | 29             | -                                                               |
 | faker-js/faker                  | 9.8.0          | -                                                               |
+| SuperTest                       | 7.1.1          | -                                                               |
 | @testing-library/webdriverio    | 3.2.1          | -                                                               |
 | @wdio/allure-reporter           | 9.15.0         | -                                                               |
 | @wdio/appium-service            | 9.15.0         | -                                                               |
@@ -73,7 +74,7 @@ Check then both to add both options in context menu.
     "appium:platformVersion": "10.0",
     "appium:deviceName": "Pixel_4_API_29",
     "appium:automationName": "UIAutomator2",
-    "appium:app": "C:\\appium-and-webdriverio-expandtesting_mobile\\apps\\apiClient.apk",
+    "appium:app": "C:\\appium-and-webdriverio-expandtesting_api_and_mobile\\apps\\apiClient.apk",
     "appium:adbExecTimeout": 120000,
     "appium:autoGrantPermissions": true,
     "appium:appActivity": "com.ab.apiclient.ui.Splash",
@@ -85,6 +86,7 @@ Check then both to add both options in context menu.
   }
   ```  
 - Open windows prompt as admin and execute ```npm install @faker-js/faker --save-dev``` to install Faker library.
+- Execute ```npm install supertest``` to install SuperTest library.
 - Open your terminal in your project directory and execute ```npx appium``` to start appium session.
 - Execute Virtual Device Manager on Android Studio.
 - Open Appium Inspector and start the appium session. 
@@ -117,6 +119,7 @@ Check then both to add both options in context menu.
 - [Getting Started](https://webdriver.io/docs/gettingstarted#run-test)
 - [Original error: 'POST /elements' cannot be proxied to UiAutomator2 server because the instrumentation process is not running (probably crashed).](https://github.com/appium/appium/issues/15087#issuecomment-1211697568)
 - [Expect](https://webdriver.io/docs/api/expect-webdriverio/)
+- [SuperTest](https://www.npmjs.com/package/supertest)
 
 # Tips:
 

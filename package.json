@@ -15,6 +15,7 @@
   },
   "dependencies": {
     "appium": "^2.19.0",
-    "appium-doctor": "^1.16.2"
+    "appium-doctor": "^1.16.2",
+    "supertest": "^7.1.1"
   }
 }
