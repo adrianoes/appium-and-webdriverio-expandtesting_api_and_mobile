@@ -8,7 +8,7 @@ API and Mobile testing in ApiClient apk using [expandtesting](https://practice.e
 | :------------------------------ |:---------------| :-------------------------------------------------------------- |
 | Visual Studio Code              | 1.89.1         | -                                                               |
 | Node.js                         | 22.11.0        | -                                                               |
-| JDK                             | 23             | -                                                               |
+| JDK                             | 21             | -                                                               |
 | Android Studio                  | 2024.2.1.11    | -                                                               |
 | ApiClient apk                   | 2.4.7          | -                                                               |
 | Appium                          | 2.19.0         | -                                                               |
@@ -40,8 +40,8 @@ Check then both to add both options in context menu.
 - Open your terminal in your project directory and execute ```npm init``` to initiate a project.
 - Open your terminal in your project directory and execute ```npm i appium``` to install Appium.
 - Open your terminal in your project directory and execute ```npm i appium-doctor``` to install Appium Doctor.
-- Right click :point_right: **My Computer** and select :point_right: **Properties**. On the :point_right: **Advanced** tab, select :point_right: **Environment Variables**, and then edit JAVA_HOME to point to where the JDK software is located, for example, C:\Program Files\Java\jdk-23.
-- Right click :point_right: **My Computer** and select :point_right: **Properties**. On the :point_right: **Advanced** tab, select :point_right: **Environment Variables**, and then edit ANDROID_HOME to point to where the sdk software is located, for example, C:\Users\user\AppData\Local\Android\Sdk.
+- Right click :point_right: **My Computer** and select :point_right: **Properties**. On the :point_right: **Advanced** tab, select :point_right: **Environment Variables**, and then, in System Variables, create a variaable named JAVA_HOME to point to where the JDK software is located, for example, C:\Program Files\Java\jdk-21.
+- Right click :point_right: **My Computer** and select :point_right: **Properties**. On the :point_right: **Advanced** tab, select :point_right: **Environment Variables**, and then, in System Variables, create a variaable named ANDROID_HOME to point to where the sdk software is located, for example, C:\Users\user\AppData\Local\Android\Sdk.
 - Right click :point_right: **My Computer** and select :point_right: **Properties**. On the :point_right: **Advanced** tab, select :point_right: **Environment Variables**, and then edit Path system variable with the new %JAVA_HOME%\bin and %ANDROID_HOME%\platform-tools entries.
 - Open your terminal in your project directory and execute ```npm init wdio .``` to initiate a project. Configure the project as below instructions:
   - A project named "appium-and-webdriverio-expandtesting_mobile" was detected at "C:\appium-and-webdriverio-expandtesting_mobile", correct? Yes;
